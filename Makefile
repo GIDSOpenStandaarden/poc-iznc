@@ -1,4 +1,4 @@
-# Makefile for OZO FHIR Implementation Guide
+# Makefile for POC IZNC FHIR Implementation Guide
 # This Makefile is designed to run INSIDE the Docker container
 
 # Variables
@@ -37,7 +37,7 @@ install-dependencies:
 # Build Implementation Guide using IG Publisher
 .PHONY: build-ig
 build-ig:
-	@echo "Building OZO Implementation Guide with version $(VERSION)..."
+	@echo "Building POC IZNC Implementation Guide with version $(VERSION)..."
 	@echo "Running SUSHI to compile FSH files..."
 	@sushi .
 	@echo "Generating PlantUML diagrams..."
@@ -51,9 +51,9 @@ build-ig:
 		echo "ERROR: Build did not create ./output/package.tgz"; \
 		exit 1; \
 	fi
-	@echo "Copying package.tgz to: ./output/fhir.ozo-$(VERSION).tgz"
-	@cp ./output/package.tgz ./output/fhir.ozo-$(VERSION).tgz
-	@echo "Successfully created: ./output/fhir.ozo-$(VERSION).tgz"
+	@echo "Copying package.tgz to: ./output/gids.poc.iznc-$(VERSION).tgz"
+	@cp ./output/package.tgz ./output/gids.poc.iznc-$(VERSION).tgz
+	@echo "Successfully created: ./output/gids.poc.iznc-$(VERSION).tgz"
 	@echo "IG Publisher completed successfully"
 
 # Convert JSON examples to FSH using GoFSH
@@ -103,12 +103,12 @@ validate:
 # Show version
 .PHONY: version
 version:
-	@echo "OZO Implementation Guide Version: $(VERSION)"
+	@echo "POC IZNC Implementation Guide Version: $(VERSION)"
 
 # Help target
 .PHONY: help
 help:
-	@echo "OZO FHIR Implementation Guide - Available Make Targets"
+	@echo "POC IZNC FHIR Implementation Guide - Available Make Targets"
 	@echo ""
 	@echo "This Makefile is designed to run INSIDE the Docker container."
 	@echo "For instructions on running from the host machine, see README.md"
@@ -116,7 +116,7 @@ help:
 	@echo "Building:"
 	@echo "  make build           - Build IG (calls install-dependencies and build-ig)"
 	@echo "  make build-ig        - Build Implementation Guide and create installable package"
-	@echo "                         Creates: ./output/fhir.ozo-$(VERSION).tgz"
+	@echo "                         Creates: ./output/gids.poc.iznc-$(VERSION).tgz"
 	@echo "  make install-dependencies - Install FHIR dependencies"
 	@echo ""
 	@echo "Development:"
