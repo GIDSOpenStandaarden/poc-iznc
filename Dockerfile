@@ -16,6 +16,7 @@ RUN apt-get update && \
         python3-pip \
         python3-yaml \
         graphviz \
+        plantuml \
         jekyll \
         nodejs \
         npm \
