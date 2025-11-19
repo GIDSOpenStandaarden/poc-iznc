@@ -26,6 +26,10 @@ Infrastructure improvements and documentation link updates.
 - Updated all relative links to `specificatie.md` to use GitHub URL
   - Now pointing to: https://github.com/nuts-foundation/toepassing-instante-communicatie/blob/main/specificatie.md
   - Updated in `matrix-bridge-api.md`, `mcsd-integration.md`, and `CLAUDE.md`
+- Added PlantUML diagrams to documentation pages
+  - Data model diagrams in `index.md`
+  - Interaction diagrams in `matrix-bridge-api.md` and `chat-backend-webhook-api.md`
+- Removed generated PNG files from git (now generated during build)
 
 ## [0.1.1] - 2025-01-14
 
