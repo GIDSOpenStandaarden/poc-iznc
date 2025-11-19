@@ -911,8 +911,233 @@ Authorization: Bearer {token}
 - Server can batch/optimize GET requests
 - Client acknowledges receipt immediately
 
+### Session 13: Migration to FHIR Implementation Guide Structure
+
+**Date**: 2025-01-14
+
+#### Major Restructuring
+
+**Decision**: Migrate POC IZNC from standalone documentation to proper FHIR Implementation Guide
+
+**Previous Location**: `/Users/roland/Documents/Headease/Nuts/toepassing-instante-communicatie/poc-iznc/`
+**New Location**: `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/`
+**Repository**: https://github.com/GIDSOpenStandaarden/poc-iznc.git
+
+#### Tasks Completed
+
+1. **IG Directory Structure**
+   - Created proper IG directory structure based on OZO Implementation Guide
+   - Set up `input/pagecontent/` for markdown pages
+   - Set up `input/images/` for generated diagrams
+   - Set up `input/images-source/` for PlantUML source files
+   - Set up `input/fsh/` for FHIR Shorthand definitions
+
+2. **SUSHI Configuration**
+   - Created `sushi-config.yaml` based on OZO IG template
+   - Package ID: `gids.poc.iznc`
+   - Canonical: `https://gidsopenstandaarden.github.io/poc-iznc`
+   - Title: POC IZNC - Integrated Care Network Communication
+   - Version: 0.1.1
+   - License: CC-BY-SA-4.0
+   - Publisher: Headease
+
+3. **Content Migration**
+   - Moved `README.md` → `input/pagecontent/index.md`
+   - Moved all `specs/*.md` → `input/pagecontent/`
+   - Updated all internal links from markdown (`.md`) to HTML (`.html`)
+   - Updated external references to GitHub URLs
+
+4. **PlantUML Diagrams**
+   - Created data model diagrams:
+     - `iznc-network-datamodel.plantuml` - Network and organizational structure
+     - `iznc-messages-datamodel.plantuml` - Message and event structure
+   - Created sequence diagrams:
+     - `iznc-01-discovery-interaction.plantuml` - Care network discovery flow
+     - `iznc-02-read-interaction.plantuml` - Reading threads and messages
+     - `iznc-03-create-interaction.plantuml` - Creating threads and messages
+     - `iznc-04-notification-interaction.plantuml` - Webhook notifications
+   - Generated PNG images from PlantUML sources
+   - Numbered diagrams for proper ordering (iznc-01, iznc-02, etc.)
+   - Fixed syntax error in iznc-02-read-interaction.plantuml (line split issue)
+
+5. **mCSD Integration Documentation**
+   - Created `input/pagecontent/mcsd-integration.md`
+   - **Critical Identity Distinction**:
+     - ✅ **Practitioners**: UZI numbers - provisioned via mCSD
+     - ✅ **Organizations**: URA numbers - provisioned via mCSD
+     - ❌ **Patients**: BSN - **NOT related to mCSD**
+   - Documented optional POC use cases:
+     - Practitioner enrichment (name, role, photo)
+     - Practitioner invitations (if not in care team)
+   - Provided FHIR resource examples with Matrix IDs
+   - Explained BSN-based discovery as separate from mCSD
+
+6. **Docker Build Infrastructure**
+   - Copied Docker approach from OZO Implementation Guide
+   - Created `Dockerfile` with:
+     - Microsoft .NET SDK 8.0
+     - SUSHI 3.16.5
+     - IG Publisher 2.0.15
+     - PlantUML, GraphViz, Jekyll, Java, Python, Node.js
+   - Created `docker-entrypoint.sh` for build execution
+   - Created `build_with_image.sh` for quick Docker builds
+   - Created `scripts/get_dependencies.py` for FHIR package dependencies
+   - Updated `Makefile` for POC IZNC naming:
+     - Package output: `gids.poc.iznc-$(VERSION).tgz`
+     - All help text updated
+     - PlantUML diagram generation
+     - Dependency installation
+
+7. **Documentation Updates**
+   - Created new root `README.md` for IG repository
+   - Focused on Docker-only build procedures
+   - Two build options:
+     - Option 1: Build Docker image locally
+     - Option 2: Use pre-built image (fastest)
+   - Removed superfluous `cd` commands from README (local context)
+   - Updated structure section to show IG layout
+
+8. **Version Updates**
+   - Bumped version to 0.1.1
+   - Updated CHANGELOG.md with IG migration and improvements
+
+#### Key Design Decisions
+
+**Why FHIR Implementation Guide?**
+- Professional structure for healthcare specifications
+- Standard FHIR tooling (SUSHI, IG Publisher)
+- GitHub Pages publication with proper website
+- Proper versioning and package distribution
+- Better integration with FHIR ecosystem
+
+**Docker-First Build Approach**
+- Consistent build environment across platforms
+- No local tool installation required
+- Reproducible builds
+- Easier for contributors to get started
+- Matches approach from OZO Implementation Guide
+
+**PlantUML Diagram Strategy**
+- Source files in `input/images-source/`
+- Generated PNGs in `input/images/`
+- Both checked into git for users without PlantUML
+- Automatic generation during build process
+- Numbered prefixes for proper ordering
+
+**mCSD Scope Clarification**
+- Clear distinction: BSN ≠ mCSD
+- BSN is for patient discovery (separate system)
+- mCSD is ONLY for healthcare provider infrastructure (UZI/URA)
+- Optional in POC, relevant for practitioner features only
+
+#### Architecture Diagrams Created
+
+**Network Data Model** (`iznc-network-datamodel.plantuml`):
+- User, Organization, CareNetwork entities
+- Participant, Thread, Subscription relationships
+- BSNMapping as encrypted layer
+- Shows Matrix space/room mappings
+
+**Message Data Model** (`iznc-messages-datamodel.plantuml`):
+- Message, Sender, ReadReceipt, Attachment entities
+- WebhookEvent polymorphism
+- Event types: MessageNew, MessageRead, ThreadNew, ParticipantJoined/Left
+- Shows event notification structure
+
+**Discovery Interaction** (`iznc-01-discovery-interaction.plantuml`):
+- Chat Backend → Matrix Bridge API flow
+- BSN → Matrix user ID resolution
+- Auto-provisioning logic
+- Care network discovery by URA
+
+**Read Interaction** (`iznc-02-read-interaction.plantuml`):
+- Get threads in care network
+- Get messages in thread
+- Pagination support
+- Matrix room ID resolution
+
+**Create Interaction** (`iznc-03-create-interaction.plantuml`):
+- Create thread flow
+- Send message flow
+- Attachment upload
+- Matrix event creation
+
+**Notification Interaction** (`iznc-04-notification-interaction.plantuml`):
+- Subscription creation
+- Webhook delivery
+- Event types and payloads
+- Error handling and retries
+
+#### Files Updated
+
+**New Files**:
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/sushi-config.yaml`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/Dockerfile`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/docker-entrypoint.sh`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/build_with_image.sh`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/Makefile`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/scripts/get_dependencies.py`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/pagecontent/index.md`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/pagecontent/matrix-bridge-api.md`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/pagecontent/chat-backend-webhook-api.md`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/pagecontent/fhir-first-approach.md`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/pagecontent/mcsd-integration.md`
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/images-source/*.plantuml` (6 files)
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/images/*.png` (6 files)
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/input/images/README.md`
+
+**Updated Files**:
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/README.md` (new root README)
+- `/Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc/CHANGELOG.md` (version 0.1.1)
+
+#### Technical Details
+
+**IG Publisher Configuration** (`ig.ini`):
+- Uses standard FHIR IG Publisher
+- Generates HTML website in `output/` directory
+- Creates publishable package: `gids.poc.iznc-0.1.1.tgz`
+- Publishes to `public/` for GitHub Pages
+
+**Build Process**:
+1. Install FHIR dependencies from sushi-config.yaml
+2. Run SUSHI to compile FSH files
+3. Generate PlantUML diagrams (SVG format)
+4. Run IG Publisher
+5. Create versioned package file
+6. Generate publishable website
+
+**Docker Build Command**:
+```bash
+# Option 1: Local build
+docker build -t poc-iznc-builder .
+docker run --rm -v "${PWD}:/src" poc-iznc-builder
+open output/index.html
+
+# Option 2: Pre-built image
+./build_with_image.sh
+```
+
+#### Commits
+
+- Created IG structure and migrated content
+- Added PlantUML diagrams
+- Fixed PlantUML syntax error
+- Added mCSD integration documentation
+- Added Docker build infrastructure
+- Updated README for Docker-only build
+- Removed superfluous cd commands from README
+
+#### Outstanding Items
+
+- Build and test the IG locally
+- Publish to GitHub Pages
+- Add CI/CD pipeline for automated builds
+- Consider adding FHIR profiles/resources for Chat API
+
 ---
 
-**Status**: Proof of Concept - In Development
-**Version**: 0.1.0
-**Last Update**: 2025-01-13
+**Status**: FHIR Implementation Guide - In Development
+**Version**: 0.1.1
+**Last Update**: 2025-01-14
+**IG Location**: /Users/roland/Documents/Projects/HeadEase/GIDS/gids-poc-iznc
+**Published URL**: https://gidsopenstandaarden.github.io/poc-iznc
