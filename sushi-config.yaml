@@ -10,7 +10,7 @@ name: gids-poc-iznc
 title: POC IZNC - Integrated Care Network Communication
 description: Proof of Concept for connecting healthcare chat applications to Matrix instant network communication
 status: draft # draft | active | retired | unknown
-version: 0.1.1
+version: 0.1.2
 fhirVersion: 4.0.1 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2025+
 releaseLabel: ci-build # ci-build | draft | qa-preview | ballot | trial-use | release | update | normative+trial-use

@@ -10,6 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - None yet
 
+## [0.1.2] - 2025-11-19
+
+### Summary
+Infrastructure improvements and documentation link updates.
+
+### Added
+- **GitHub Actions** (`.github/workflows/build_deploy.yml`)
+  - Automated build workflow using Docker
+  - GitHub Pages deployment on main branch
+  - Build artifact upload for each push
+
+### Changed
+- Renamed `master` branch to `main`
+- Updated all relative links to `specificatie.md` to use GitHub URL
+  - Now pointing to: https://github.com/nuts-foundation/toepassing-instante-communicatie/blob/main/specificatie.md
+  - Updated in `matrix-bridge-api.md`, `mcsd-integration.md`, and `CLAUDE.md`
+
 ## [0.1.1] - 2025-01-14
 
 ### Summary
