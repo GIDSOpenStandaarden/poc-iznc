@@ -83,7 +83,7 @@ This document tracks the development conversation and decisions made during the 
 **Matrix Specificatie vs NUTS Spec**
 - **Issue**: Confusion between "NUTS spec" and the Matrix specification
 - **Resolution**:
-  - The specification in `../specificatie.md` is the **"Matrix specificatie instante netwerk communicatie"**
+  - The specification at https://github.com/nuts-foundation/toepassing-instante-communicatie/blob/main/specificatie.md is the **"Matrix specificatie instante netwerk communicatie"**
   - NUTS spec is something different
   - Updated all references throughout documentation
   - Changed title in `specificatie.md` from "Toepassing instante communicatie" to "Matrix specificatie instante netwerk communicatie"
@@ -234,7 +234,7 @@ The POC introduces a **BSN-based discovery mechanism** not currently in the Matr
 - `specs/fhir-first-approach.md` - Alternative FHIR-first architecture (reference only)
 
 ### External References
-- Matrix specificatie instante netwerk communicatie: `../specificatie.md`
+- Matrix specificatie instante netwerk communicatie: https://github.com/nuts-foundation/toepassing-instante-communicatie/blob/main/specificatie.md
 - Hackathon Guide: `../hackathon_september_2025/HACKATHON_GUIDE.md`
 - OZO Implementation Guide: https://ozo-implementation-guide.headease.nl/interaction-messaging.html
 - Matrix Protocol: https://spec.matrix.org/

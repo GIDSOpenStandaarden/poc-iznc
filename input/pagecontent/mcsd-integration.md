@@ -88,7 +88,7 @@ The **LRZA (National Registry for Healthcare Addressing)** serves as the central
 
 ## mCSD in the Matrix Specification
 
-The [Matrix specification for instant network communication](../../specificatie.md) relies heavily on mCSD for:
+The [Matrix specification for instant network communication](https://github.com/nuts-foundation/toepassing-instante-communicatie/blob/main/specificatie.md) relies heavily on mCSD for:
 
 ### 1. Healthcare Provider Discovery
 
@@ -467,7 +467,7 @@ Production implementations should consider:
 
 ## References
 
-- **Matrix Specification for Instant Network Communication**: `../../specificatie.md`
+- **Matrix Specification for Instant Network Communication**: https://github.com/nuts-foundation/toepassing-instante-communicatie/blob/main/specificatie.md
 - **Generic Function Addressing (Routing)**: See NL Generic Functions Implementation Guide
 - **IHE mCSD**: https://profiles.ihe.net/ITI/mCSD/
 - **FHIR R4 Directory Resources**: https://hl7.org/fhir/R4/

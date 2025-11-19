@@ -817,6 +817,6 @@ This POC introduces a **URA-based discovery mechanism** for care networks that i
 
 ## References
 
-- **Matrix specificatie instante netwerk communicatie**: `../../specificatie.md`
+- **Matrix specificatie instante netwerk communicatie**: https://github.com/nuts-foundation/toepassing-instante-communicatie/blob/main/specificatie.md
 - **Matrix Client-Server API**: https://spec.matrix.org/latest/client-server-api/
 - **Matrix Spaces**: https://spec.matrix.org/latest/client-server-api/#spaces
