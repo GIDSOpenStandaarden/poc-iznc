@@ -1,0 +1,50 @@
+@startuml
+participant "Chat Backend" as Backend
+participant "Matrix Bridge API" as Bridge
+database "BSN Mapping DB" as DB
+participant "Matrix Homeserver" as Matrix
+participant "Remote Matrix\nHomeserver" as RemoteMatrix
+
+== Discovery of Care Networks for URA/BSN Combination ==
+
+Backend -> Bridge : POST /api/v1/care-networks/discover\n{\n  "uras": ["90000001", "90000002"],\n  "userBsn": "123456789"\n}
+
+activate Bridge
+
+Bridge -> DB : Lookup BSN → Matrix user ID\n(encrypted query)
+alt BSN not found in mapping
+    Bridge -> DB : Generate Matrix user ID:\n@iznc_{hash}:homeserver.example.com
+    Bridge -> Matrix : Register Matrix account\n(auto-provision)
+    Matrix --> Bridge : Account created
+    Bridge -> DB : Store BSN ↔ Matrix user ID mapping\n(encrypted)
+    DB --> Bridge : Mapping stored
+else BSN found
+    DB --> Bridge : Return Matrix user ID
+end
+
+Bridge -> Matrix : Query spaces for user\nfiltered by URA metadata
+Matrix --> Bridge : Return spaces:\n- !space123 (URA: 90000001)\n- !space456 (URA: 90000002)
+
+Bridge -> Matrix : Get space !space123 details
+Matrix --> Bridge : Space metadata + participants
+
+alt Space includes federated members
+    Bridge -> RemoteMatrix : Get remote participant details
+    RemoteMatrix --> Bridge : Remote user profiles
+end
+
+Bridge -> Matrix : Get space !space456 details
+Matrix --> Bridge : Space metadata + participants
+
+Bridge -> Matrix : Get thread count per space\n(child rooms)
+Matrix --> Bridge : Thread counts
+
+Bridge -> Matrix : Get unread counts for user\nper space
+Matrix --> Bridge : Unread counts
+
+Bridge --> Backend : 200 OK\n{\n  "careNetworks": [\n    {\n      "careNetworkId": "!space123:homeserver.example.com",\n      "ura": "90000001",\n      "organizationName": "Ziekenhuis Voorbeeld",\n      "name": "Zorgnetwerk Jan Jansen - Ziekenhuis",\n      "subject": {...},\n      "participants": [...],\n      "threadCount": 5,\n      "unreadCount": 2\n    },\n    {...}\n  ]\n}
+
+deactivate Bridge
+
+note over Backend, RemoteMatrix : Care networks discovered and returned\nwith organization context (URA)\nBSN never exposed in Matrix protocol
+@enduml

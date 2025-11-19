@@ -1,0 +1,78 @@
+# ╭─────────────────────────Commonly Used ImplementationGuide Properties───────────────────────────╮
+# │  The properties below are used to create the ImplementationGuide resource. The most commonly   │
+# │  used properties are included. For a list of all supported properties and their functions,     │
+# │  see: https://fshschool.org/docs/sushi/configuration/.                                         │
+# ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
+id: gids.poc.iznc
+canonical: https://gidsopenstandaarden.github.io/poc-iznc
+url: https://gidsopenstandaarden.github.io/poc-iznc
+name: gids-poc-iznc
+title: POC IZNC - Integrated Care Network Communication
+description: Proof of Concept for connecting healthcare chat applications to Matrix instant network communication
+status: draft # draft | active | retired | unknown
+version: 0.1.1
+fhirVersion: 4.0.1 # https://www.hl7.org/fhir/valueset-FHIR-version.html
+copyrightYear: 2025+
+releaseLabel: ci-build # ci-build | draft | qa-preview | ballot | trial-use | release | update | normative+trial-use
+license: CC-BY-SA-4.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
+# jurisdiction: urn:iso:std:iso:3166#NL "Netherlands" # https://www.hl7.org/fhir/valueset-jurisdiction.html
+publisher:
+  name: Headease
+  url: https://headease.nl
+
+# The dependencies property corresponds to IG.dependsOn. The key is the
+# package id and the value is the version (or dev/current). For advanced
+# use cases, the value can be an object with keys for id, uri, and version.
+# dependencies:
+#   nictiz.fhir.nl.r4.zib2020:
+#     version: 0.12.0-beta.4
+#     uri: http://simplifier.net/packages/nictiz.fhir.nl.r4.zib2020#0.12.0-beta.4
+
+# The pages property corresponds to IG.definition.page. SUSHI can
+# auto-generate the page list, but if the author includes pages in
+# this file, it is assumed that the author will fully manage the
+# pages section and SUSHI will not generate any page entries.
+pages:
+  index.md:
+    title: POC IZNC - Home
+
+  matrix-bridge-api.md:
+    title: Matrix Bridge API Specification
+
+  chat-backend-webhook-api.md:
+    title: Chat Backend Webhook API
+
+  mcsd-integration.md:
+    title: mCSD and Generic Function Addressing
+
+  fhir-first-approach.md:
+    title: Alternative - FHIR-First Approach
+
+# The parameters property represents IG.definition.parameter. Rather
+# than a list of code/value pairs (as in the ImplementationGuide
+# resource), the code is the YAML key. If a parameter allows repeating
+# values, the value in the YAML should be a sequence/array.
+parameters: # see https://confluence.hl7.org/display/FHIR/Implementation+Guide+Parameters
+  excludettl: true
+  path-resource:
+    - input/resources
+    - fsh-generated/resources
+  path-pages:
+    - input/pagecontent
+    - fsh-generated/includes
+  show-inherited-invariants: false
+  usage-stats-opt-out: true
+
+# ╭────────────────────────────────────────────menu.xml────────────────────────────────────────────╮
+# │ The menu property will be used to generate the input/menu.xml file. The menu is represented    │
+# │ as a simple structure where the YAML key is the menu item name and the value is the URL.       │
+# ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
+menu:
+  Home: index.html
+  API Specifications:
+    Matrix Bridge API: matrix-bridge-api.html
+    Chat Backend Webhook API: chat-backend-webhook-api.html
+  Context:
+    mCSD Integration: mcsd-integration.html
+    FHIR-First Approach: fhir-first-approach.html
+  Artifacts: artifacts.html

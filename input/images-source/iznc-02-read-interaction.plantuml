@@ -1,0 +1,68 @@
+@startuml
+participant "Chat Backend" as Backend
+participant "Matrix Bridge API" as Bridge
+database "BSN Mapping DB" as DB
+participant "Matrix Homeserver" as Matrix
+participant "Remote Matrix\nHomeserver" as RemoteMatrix
+
+== Reading Threads in a Care Network ==
+
+Backend -> Bridge : POST /api/v1/care-networks/{careNetworkId}/threads/search\n{\n  "bsn": "123456789"\n}
+
+activate Bridge
+
+Bridge -> DB : Resolve BSN → Matrix user ID
+DB --> Bridge : @iznc_abc123:homeserver.example.com
+
+Bridge -> Matrix : Verify user is member of space\n!space123:homeserver.example.com
+Matrix --> Bridge : Membership confirmed
+
+Bridge -> Matrix : Get child rooms of space\n(threads in care network)
+Matrix --> Bridge : List of room IDs:\n- !room456\n- !room789\n- !room101
+
+loop For each thread
+    Bridge -> Matrix : Get room details + participants\n!room456
+    Matrix --> Bridge : Topic: "Medicatie vraag"\nParticipants: [...]\nCreated: 2025-01-15T10:00:00Z
+
+    Bridge -> Matrix : Get last message in room\n!room456
+    Matrix --> Bridge : Last message:\n"U kunt het innemen met of zonder voedsel"\nSender: @dr.smith:homeserver.example.com
+
+    Bridge -> Matrix : Get unread count for user\n!room456
+    Matrix --> Bridge : Unread: 1
+end
+
+Bridge --> Backend : 200 OK\n{\n  "careNetworkId": "!space123:...",\n  "threads": [\n    {\n      "threadId": "!room456:...",\n      "topic": "Medicatie vraag",\n      "participants": [...],\n      "lastMessage": {...},\n      "unreadCount": 1,\n      "createdAt": "2025-01-15T10:00:00Z"\n    },\n    {...}\n  ]\n}
+
+deactivate Bridge
+
+== Reading Messages in a Thread ==
+
+Backend -> Bridge : POST /api/v1/threads/{threadId}/messages/search\n{\n  "bsn": "123456789",\n  "limit": 50\n}
+
+activate Bridge
+
+Bridge -> DB : Resolve BSN → Matrix user ID
+DB --> Bridge : @iznc_abc123:homeserver.example.com
+
+Bridge -> Matrix : Verify user is member of room\n!room456:homeserver.example.com
+Matrix --> Bridge : Membership confirmed
+
+Bridge -> Matrix : Get messages (paginated)\n/rooms/{roomId}/messages?limit=50
+Matrix --> Bridge : Messages timeline:\n[\n  {event_id: $event123, sender: @jan..., content: "Kan ik..."},\n  {event_id: $event124, sender: @dr.smith..., content: "Ja, u kunt..."}\n]
+
+loop For each message
+    Bridge -> Matrix : Get read receipts for message\n$event123
+    Matrix --> Bridge : Read by:\n- @dr.smith (2025-01-15T11:05:00Z)
+
+    alt Message from federated user
+        Bridge -> RemoteMatrix : Get sender profile\n@remote.user:supplier-b.example.com
+        RemoteMatrix --> Bridge : User profile: name, avatar, role
+    end
+end
+
+Bridge --> Backend : 200 OK\n{\n  "threadId": "!room456:...",\n  "messages": [\n    {\n      "messageId": "$event123",\n      "sender": {...},\n      "text": "Kan ik deze medicatie met eten innemen?",\n      "timestamp": "2025-01-15T11:00:00Z",\n      "readBy": [...]\n    },\n    {...}\n  ],\n  "pagination": {...}\n}
+
+deactivate Bridge
+
+note over Backend, RemoteMatrix : All read operations use BSN for auth\nMatrix Bridge resolves to Matrix user IDs\nSupports federated care networks
+@enduml

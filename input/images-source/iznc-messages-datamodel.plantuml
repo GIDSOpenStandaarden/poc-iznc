@@ -1,0 +1,106 @@
+@startuml
+!define RECTANGLE class
+
+RECTANGLE CareNetwork {
+  +careNetworkId: string
+  ...
+}
+
+RECTANGLE Thread {
+  +threadId: string
+  +topic: string
+  ...
+}
+
+RECTANGLE Message {
+  +messageId: string
+  +text: string
+  +timestamp: dateTime
+  +status: code (sent | delivered | read)
+  +replyTo: string (optional)
+  ...
+}
+
+RECTANGLE Sender {
+  +userId: string
+  +name: string
+  +role: code
+  ...
+}
+
+RECTANGLE ReadReceipt {
+  +userId: string
+  +name: string
+  +timestamp: dateTime
+  ...
+}
+
+RECTANGLE Attachment {
+  +filename: string
+  +contentType: string
+  +data: base64Binary
+  +url: string (optional)
+  ...
+}
+
+RECTANGLE Subscription {
+  +subscriptionId: string
+  +careNetworkId: string
+  +webhookUrl: string
+  +status: code
+  +events: code[]
+  ...
+}
+
+RECTANGLE WebhookEvent {
+  +subscriptionId: string
+  +eventType: code (message.new | message.read | thread.new | participant.joined | participant.left)
+  +careNetworkId: string
+  +timestamp: dateTime
+  +data: object
+  ...
+}
+
+RECTANGLE MessageNewEvent {
+  +threadId: string
+  +messageId: string
+  +sender: Sender
+  +hasAttachments: boolean
+  +preview: string
+  ...
+}
+
+RECTANGLE MessageReadEvent {
+  +threadId: string
+  +messageId: string
+  +reader: Sender
+  ...
+}
+
+RECTANGLE ThreadNewEvent {
+  +threadId: string
+  +topic: string
+  +creator: Sender
+  +participants: string[]
+  ...
+}
+
+RECTANGLE ParticipantEvent {
+  +threadId: string
+  +participant: Sender
+  ...
+}
+
+CareNetwork "1" --> "0..*" Thread : contains >
+Thread "1" --> "0..*" Message : contains >
+Message "1" --> "1" Sender : sender >
+Message "1" --> "0..*" ReadReceipt : readBy >
+Message "1" --> "0..*" Attachment : attachments >
+Message "0..1" --> "0..1" Message : replyTo >
+CareNetwork "1" <-- "0..*" Subscription : watches >
+Subscription "1" --> "0..*" WebhookEvent : sends >
+WebhookEvent <|-- MessageNewEvent : type >
+WebhookEvent <|-- MessageReadEvent : type >
+WebhookEvent <|-- ThreadNewEvent : type >
+WebhookEvent <|-- ParticipantEvent : type >
+@enduml

@@ -1,0 +1,71 @@
+@startuml
+participant "Chat Backend" as Backend
+participant "Matrix Bridge API" as Bridge
+database "Subscription DB" as SubDB
+participant "Matrix Homeserver" as Matrix
+participant "Remote Matrix\nHomeserver" as RemoteMatrix
+
+== Setting Up Webhook Subscription ==
+
+Backend -> Bridge : POST /api/v1/subscriptions\n{\n  "bsn": "123456789",\n  "careNetworkId": "!space123:...",\n  "webhookUrl": "https://chat-backend.example.com/webhooks/events",\n  "events": ["message.new", "message.read", "thread.new", "participant.joined"]\n}
+
+activate Bridge
+Bridge -> SubDB : Store subscription configuration\n(careNetworkId, webhookUrl, events, bsn)
+SubDB --> Bridge : Subscription created: sub-uuid-1234
+
+Bridge -> Matrix : Start sync loop for user\n/sync?filter={rooms:[!space123]}
+note right : Matrix Bridge monitors\nevents for subscribed\ncare networks
+
+Bridge --> Backend : 200 OK\n{\n  "subscriptionId": "sub-uuid-1234",\n  "careNetworkId": "!space123:...",\n  "webhookUrl": "https://...",\n  "status": "active",\n  "createdAt": "2025-01-15T10:30:00Z"\n}
+deactivate Bridge
+
+== Notification: New Message in Thread ==
+
+RemoteMatrix -> Matrix : Federated message event\nm.room.message in !room456
+activate Matrix
+Matrix -> Bridge : Sync response with new event\n{\n  "rooms": {\n    "join": {\n      "!room456": {\n        "timeline": {\n          "events": [{\n            "type": "m.room.message",\n            "event_id": "$event125",\n            "sender": "@dr.smith:supplier-b.example.com",\n            "content": {...}\n          }]\n        }\n      }\n    }\n  }\n}
+deactivate Matrix
+
+activate Bridge
+Bridge -> SubDB : Check active subscriptions\nfor care network !space123
+SubDB --> Bridge : Subscription: sub-uuid-1234\nwebhookUrl: https://chat-backend.example.com/...
+
+Bridge -> Backend : POST /webhooks/matrix-events\n{\n  "subscriptionId": "sub-uuid-1234",\n  "eventType": "message.new",\n  "careNetworkId": "!space123:...",\n  "timestamp": "2025-01-15T12:00:00Z",\n  "data": {\n    "threadId": "!room456:...",\n    "messageId": "$event125",\n    "sender": {\n      "userId": "@dr.smith:supplier-b.example.com",\n      "name": "Dr. Smith"\n    },\n    "hasAttachments": false,\n    "preview": "Wat denkt u van donderdag 14:00?"\n  }\n}
+
+Backend --> Bridge : 200 OK\n{"status": "received"}
+
+deactivate Bridge
+
+Backend -> Backend : Identify affected users\n(thread participants)
+Backend -> Backend : Push notification to WebSocket clients
+
+== Notification: New Thread Created ==
+
+Matrix -> Bridge : Sync response with new room\n{\n  "rooms": {\n    "invite": {\n      "!newroom789": {\n        "invite_state": {\n          "events": [{\n            "type": "m.room.create",\n            "content": {\n              "m.space.parent": "!space123:..."\n            }\n          }]\n        }\n      }\n    }\n  }\n}
+
+activate Bridge
+Bridge -> SubDB : Check subscriptions for !space123
+SubDB --> Bridge : sub-uuid-1234
+
+Bridge -> Backend : POST /webhooks/matrix-events\n{\n  "subscriptionId": "sub-uuid-1234",\n  "eventType": "thread.new",\n  "careNetworkId": "!space123:...",\n  "timestamp": "2025-01-15T12:10:00Z",\n  "data": {\n    "threadId": "!newroom789:...",\n    "topic": "Nieuwe vraag over medicatie",\n    "creator": {\n      "userId": "@jan.jansen:homeserver.example.com",\n      "name": "Jan Jansen"\n    }\n  }\n}
+
+Backend --> Bridge : 200 OK
+deactivate Bridge
+
+== Notification: Participant Joined Care Network ==
+
+Matrix -> Bridge : Sync response with membership change\n{\n  "rooms": {\n    "join": {\n      "!space123": {\n        "timeline": {\n          "events": [{\n            "type": "m.room.member",\n            "state_key": "@nurse.jones:homeserver.example.com",\n            "content": {\n              "membership": "join"\n            }\n          }]\n        }\n      }\n    }\n  }\n}
+
+activate Bridge
+Bridge -> SubDB : Check subscriptions for !space123
+SubDB --> Bridge : sub-uuid-1234
+
+Bridge -> Backend : POST /webhooks/matrix-events\n{\n  "subscriptionId": "sub-uuid-1234",\n  "eventType": "participant.joined",\n  "careNetworkId": "!space123:...",\n  "timestamp": "2025-01-15T12:15:00Z",\n  "data": {\n    "threadId": "!space123:...",\n    "participant": {\n      "userId": "@nurse.jones:homeserver.example.com",\n      "name": "Verpleegkundige Jones",\n      "role": "care-professional"\n    }\n  }\n}
+
+Backend --> Bridge : 200 OK
+deactivate Bridge
+
+Backend -> Backend : Push update to affected users\nvia WebSocket
+
+note over Backend, RemoteMatrix : Webhook notifications enable real-time updates\nMatrix Bridge monitors sync events\nSupports federated message events\nChat Backend handles user notification routing
+@enduml

@@ -1,0 +1,73 @@
+@startuml
+!define RECTANGLE class
+
+RECTANGLE User {
+  +bsn: string
+  +matrixUserId: string
+  +name: string
+  +role: code
+  +uziNumber: string (optional)
+  +email: string (optional)
+  +avatarUrl: string (optional)
+  ...
+}
+
+RECTANGLE Organization {
+  +ura: string
+  +name: string
+  ...
+}
+
+RECTANGLE CareNetwork {
+  +careNetworkId: string (Matrix Space ID)
+  +ura: string
+  +organizationName: string
+  +name: string
+  +createdAt: dateTime
+  +threadCount: integer
+  +unreadCount: integer
+  ...
+}
+
+RECTANGLE Participant {
+  +matrixUserId: string
+  +name: string
+  +role: code (patient | care-professional | mantelzorger)
+  +uziNumber: string (optional)
+  ...
+}
+
+RECTANGLE Thread {
+  +threadId: string (Matrix Room ID)
+  +topic: string
+  +createdAt: dateTime
+  +unreadCount: integer
+  ...
+}
+
+RECTANGLE Subscription {
+  +subscriptionId: string
+  +careNetworkId: string
+  +webhookUrl: string
+  +status: code (active | failing | deleted)
+  +events: code[]
+  +createdAt: dateTime
+  ...
+}
+
+RECTANGLE BSNMapping {
+  +bsn: string (encrypted)
+  +matrixUserId: string
+  +createdAt: dateTime
+  ...
+}
+
+User "1" <-- "1" BSNMapping : maps to >
+Organization "1" <-- "1..*" CareNetwork : manages >
+CareNetwork "1" --> "1" Participant : subject (patient) >
+CareNetwork "1" --> "1..*" Participant : participants >
+CareNetwork "1" --> "0..*" Thread : contains >
+Thread "1" --> "1..*" Participant : participants >
+User "1" --> "0..*" Participant : as >
+CareNetwork "1" <-- "0..*" Subscription : watches >
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+participant "Chat Backend" as Backend
+participant "Matrix Bridge API" as Bridge
+database "BSN Mapping DB" as DB
+participant "Matrix Homeserver" as Matrix
+participant "Remote Matrix\nHomeserver" as RemoteMatrix
+
+== Creating a New Thread in a Care Network ==
+
+Backend -> Bridge : POST /api/v1/threads\n{\n  "initiatorBsn": "123456789",\n  "careNetworkId": "!space123:...",\n  "topic": "Afspraak maken voor controle",\n  "participantIds": [\n    {"type": "bsn", "value": "123456789"},\n    {"type": "matrixUserId", "value": "@dr.smith:homeserver.example.com"}\n  ],\n  "initialMessage": {\n    "text": "Ik wil graag een afspraak maken"\n  }\n}
+
+activate Bridge
+
+Bridge -> DB : Resolve initiatorBsn → Matrix user ID
+DB --> Bridge : @iznc_abc123:homeserver.example.com
+
+Bridge -> DB : Resolve participant BSNs → Matrix user IDs
+DB --> Bridge : @iznc_abc123:homeserver.example.com
+
+Bridge -> Matrix : Verify all participants are members\nof space !space123
+Matrix --> Bridge : All confirmed
+
+Bridge -> Matrix : Create new room (child of space)\n{\n  "name": "Afspraak maken voor controle",\n  "topic": "Afspraak maken voor controle",\n  "m.space.parent": "!space123:..."\n}
+Matrix --> Bridge : Room created: !newroom789:homeserver.example.com
+
+Bridge -> Matrix : Add room as child of space\nSend m.space.child state event
+Matrix --> Bridge : Child relationship created
+
+Bridge -> Matrix : Invite participants to room\n[@iznc_abc123, @dr.smith]
+Matrix --> Bridge : Invites sent
+
+Bridge -> Matrix : Send initial message\n{\n  "msgtype": "m.text",\n  "body": "Ik wil graag een afspraak maken"\n}
+Matrix --> Bridge : Message sent: $msg123
+
+Bridge --> Backend : 200 OK\n{\n  "threadId": "!newroom789:...",\n  "careNetworkId": "!space123:...",\n  "topic": "Afspraak maken voor controle",\n  "participants": [...],\n  "createdAt": "2025-01-15T12:00:00Z",\n  "initialMessageId": "$msg123"\n}
+
+deactivate Bridge
+
+== Adding a Message to a Thread ==
+
+Backend -> Bridge : POST /api/v1/threads/{threadId}/messages\n{\n  "senderBsn": "987654321",\n  "text": "Wat denkt u van donderdag 14:00?",\n  "attachments": [\n    {\n      "filename": "beschikbaarheid.pdf",\n      "contentType": "application/pdf",\n      "data": "base64..."\n    }\n  ],\n  "replyTo": "$msg123"\n}
+
+activate Bridge
+
+Bridge -> DB : Resolve senderBsn → Matrix user ID
+DB --> Bridge : @dr.smith:homeserver.example.com
+
+Bridge -> Matrix : Verify sender is member of room
+Matrix --> Bridge : Membership confirmed
+
+alt Message has attachments
+    Bridge -> Matrix : Upload attachment to media repository\nPUT /_matrix/media/v3/upload
+    Matrix --> Bridge : Media uploaded:\nmxc://homeserver.example.com/abc123
+end
+
+Bridge -> Matrix : Send message event\n{\n  "msgtype": "m.text",\n  "body": "Wat denkt u van donderdag 14:00?",\n  "m.relates_to": {\n    "m.in_reply_to": {"event_id": "$msg123"}\n  },\n  "m.file": {"url": "mxc://..."}\n}
+Matrix --> Bridge : Event sent: $event125
+
+alt Thread has federated members
+    Matrix -> RemoteMatrix : Federate message event\n(Matrix server-to-server)
+    RemoteMatrix --> Matrix : Event received and processed
+end
+
+Bridge --> Backend : 200 OK\n{\n  "messageId": "$event125",\n  "threadId": "!newroom789:...",\n  "sender": {...},\n  "text": "Wat denkt u van donderdag 14:00?",\n  "timestamp": "2025-01-15T11:45:00Z",\n  "status": "sent"\n}
+
+deactivate Bridge
+
+note over Backend, RemoteMatrix : Message creation supports:\n- BSN-based or Matrix user ID participants\n- Attachments via media upload\n- Message threading (replyTo)\n- Federation to remote homeservers
+@enduml
