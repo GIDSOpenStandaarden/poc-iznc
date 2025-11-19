@@ -24,8 +24,6 @@ Visit the published Implementation Guide at: https://gidsopenstandaarden.github.
 
 **Option 1: Build Docker Image and Run**
 ```bash
-cd /path/to/gids-poc-iznc
-
 # Build the Docker image (first time only)
 docker build -t poc-iznc-builder .
 
@@ -38,8 +36,6 @@ open output/index.html
 
 **Option 2: Use Pre-built Image (Fastest)**
 ```bash
-cd /path/to/gids-poc-iznc
-
 # Run the quick build script
 ./build_with_image.sh
 ```
