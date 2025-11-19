@@ -18,24 +18,41 @@ This Implementation Guide provides comprehensive documentation for:
 
 Visit the published Implementation Guide at: https://gidsopenstandaarden.github.io/poc-iznc
 
-### Build Locally
+### Build Locally with Docker
 
-1. **Prerequisites**:
-   - Java JDK 11 or higher
-   - Sushi (FHIR Shorthand) - Install: `npm install -g fsh-sushi`
-   - IG Publisher
+**Prerequisites**: Docker Desktop or Docker Engine
 
-2. **Build**:
-   ```bash
-   # Run the IG Publisher
-   ./_updatePublisher.sh
+**Option 1: Build Docker Image and Run**
+```bash
+cd /path/to/gids-poc-iznc
 
-   # Or use Make
-   make build
-   ```
+# Build the Docker image (first time only)
+docker build -t poc-iznc-builder .
 
-3. **View**:
-   Open `output/index.html` in your browser
+# Run the build
+docker run --rm -v "${PWD}:/src" poc-iznc-builder
+
+# Open the result
+open output/index.html
+```
+
+**Option 2: Use Pre-built Image (Fastest)**
+```bash
+cd /path/to/gids-poc-iznc
+
+# Run the quick build script
+./build_with_image.sh
+```
+
+This will automatically:
+1. Pull the latest pre-built image (if available)
+2. Run the build in a container
+3. Open the result in your browser
+
+**Build Output**:
+- `output/index.html` - Main IG entry point
+- `output/gids.poc.iznc-0.1.1.tgz` - Installable FHIR package
+- `public/` - Published IG website
 
 ## 📁 Structure
 
