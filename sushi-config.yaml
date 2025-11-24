@@ -38,9 +38,15 @@ pages:
 
   matrix-bridge-api.md:
     title: Matrix Bridge API Specification
+    extension:
+      - url: http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status
+        valueCode: draft
 
   chat-backend-webhook-api.md:
     title: Chat Backend Webhook API
+    extension:
+      - url: http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status
+        valueCode: draft
 
   mcsd-integration.md:
     title: mCSD and Generic Function Addressing
