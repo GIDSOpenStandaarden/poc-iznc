@@ -143,7 +143,7 @@ Chat Backend → FHIR Server ← Matrix Bridge → Matrix Homeserver
 ```
 
 **Example Request**:
-```http
+```text
 GET /fhir/CareTeam?patient=Patient/123
 Accept: application/fhir+json
 ```
@@ -208,7 +208,7 @@ Accept: application/fhir+json
 
 ### 3. Start New Thread
 
-```http
+```text
 POST /fhir/CommunicationRequest
 Content-Type: application/fhir+json
 
@@ -241,7 +241,7 @@ Content-Type: application/fhir+json
 
 ### 4. Send Message
 
-```http
+```text
 POST /fhir/Communication
 Content-Type: application/fhir+json
 
@@ -277,7 +277,7 @@ Content-Type: application/fhir+json
 
 ### 5. Get Messages
 
-```http
+```text
 GET /fhir/Communication?part-of=CommunicationRequest/245&_sort=-sent
 Accept: application/fhir+json
 ```
@@ -286,7 +286,7 @@ Accept: application/fhir+json
 
 ### 6. Mark as Read
 
-```http
+```text
 POST /fhir/Task
 Content-Type: application/fhir+json
 
@@ -313,7 +313,7 @@ Content-Type: application/fhir+json
 
 ### Setup Subscription
 
-```http
+```text
 POST /fhir/Subscription
 Content-Type: application/fhir+json
 
@@ -336,7 +336,7 @@ Content-Type: application/fhir+json
 
 With no `payload` field (omitted), FHIR server sends empty POST to subscription-specific endpoint:
 
-```http
+```text
 POST /fhir/webhooks/sub-123
 Authorization: Bearer {token}
 
@@ -345,7 +345,7 @@ Authorization: Bearer {token}
 
 **Important**: The notification contains **no body**. The subscription ID is in the URL path. The Chat Backend must fetch updates using `_history` with `_since` parameter:
 
-```http
+```text
 GET /fhir/Communication/_history?_since=2025-01-13T10:30:00Z&subject=Patient/123
 Accept: application/fhir+json
 ```
