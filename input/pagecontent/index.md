@@ -46,11 +46,11 @@ This is a proof-of-concept implementation for connecting a healthcare chat appli
 
 ### Network Structure
 
-<img src="iznc-network-datamodel.png" alt="Network Data Model" style="max-width: 100%;" />
+<img src="iznc-network-datamodel.svg" alt="Network Data Model" style="max-width: 100%;" />
 
 ### Message Structure
 
-<img src="iznc-messages-datamodel.png" alt="Message Data Model" style="max-width: 100%;" />
+<img src="iznc-messages-datamodel.svg" alt="Message Data Model" style="max-width: 100%;" />
 
 ## 🎯 Key Concepts
 

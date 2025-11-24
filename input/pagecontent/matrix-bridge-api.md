@@ -115,7 +115,7 @@ Matrix Bridge returns result (no Matrix user ID exposed)
 
 ### 1. Care Network Discovery
 
-<img src="iznc-01-discovery-interaction.png" alt="Discovery Interaction" style="max-width: 100%;" />
+<img src="iznc-01-discovery-interaction.svg" alt="Discovery Interaction" style="max-width: 100%;" />
 
 #### Discover Care Networks for Organizations
 ```
@@ -310,7 +310,7 @@ DELETE /api/v1/subscriptions/{subscriptionId}
 
 ### 3. Thread Management
 
-<img src="iznc-02-read-interaction.png" alt="Read Interaction" style="max-width: 100%;" />
+<img src="iznc-02-read-interaction.svg" alt="Read Interaction" style="max-width: 100%;" />
 
 #### Get Threads in Care Network
 ```
@@ -428,7 +428,7 @@ POST /api/v1/threads
 
 ### 4. Message Operations
 
-<img src="iznc-03-create-interaction.png" alt="Create Interaction" style="max-width: 100%;" />
+<img src="iznc-03-create-interaction.svg" alt="Create Interaction" style="max-width: 100%;" />
 
 #### Get Messages in Thread
 ```

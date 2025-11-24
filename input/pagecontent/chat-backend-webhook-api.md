@@ -46,7 +46,7 @@ Chat Application Backend pushes to frontend clients via WebSocket
 
 ## Webhook Endpoints
 
-<img src="iznc-04-notification-interaction.png" alt="Notification Interaction" style="max-width: 100%;" />
+<img src="iznc-04-notification-interaction.svg" alt="Notification Interaction" style="max-width: 100%;" />
 
 ### 1. Unified Event Webhook
 

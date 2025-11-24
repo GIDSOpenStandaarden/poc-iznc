@@ -44,6 +44,7 @@ build-ig:
 	@if command -v plantuml >/dev/null 2>&1; then \
 		mkdir -p ./input/images; \
 		plantuml -o ../images/ -tsvg ./input/images-source/*.plantuml 2>/dev/null || true; \
+		plantuml -o ../images/ -tpng ./input/images-source/*.plantuml 2>/dev/null || true; \
 	fi
 	@echo "Running IG Publisher..."
 	@java -jar /usr/local/publisher.jar -ig ig.ini
